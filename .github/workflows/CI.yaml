@@ -1,0 +1,35 @@
+name: Cross-Platform C++ Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up environment
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            echo "CXX=g++" >> $GITHUB_ENV
+          elif [ "${{ runner.os }}" == "macOS" ]; then
+            echo "CXX=clang++" >> $GITHUB_ENV
+          else
+            echo "CXX=g++" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Build project
+        run: |
+          mkdir bin
+          make
