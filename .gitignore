@@ -1,4 +1,38 @@
-.jukit/
+# Build artifacts
+/build/
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.dylib
 
-.txt
-.bin
+# IDE and editor files
+.vscode/
+.idea/
+*.code-workspace
+*.suo
+*.user
+*.VC.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# CMake and Makefiles
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Compiled binary outputs
+bin/
+.jukit/
+*.bin
+
+# System-specific files
+.DS_Store
+Thumbs.db
