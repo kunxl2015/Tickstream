@@ -32,6 +32,8 @@ cmake_install.cmake
 bin/
 .jukit/
 *.bin
+*.txt
+**/*.txt
 
 # System-specific files
 .DS_Store
