@@ -8,17 +8,14 @@ namespace tickstream {
 
 class FileManager{
 public:
-	FileManager(const char *inputDir, const char *outputDir);
+	FileManager() = default;
 	~FileManager() = default;
 
 	void readRecord(const size_t &fIndex, MarketData &mdata);
 
-	void openFiles();
+	void openFile(const char *fPath);
 	void closeFiles();
 private:
-	const char *_inputDir;
-	const char *_outputDir;
-
 	std::ofstream _outputStream;
 	std::vector<std::ifstream> _inputStreams;
 };

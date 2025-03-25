@@ -7,9 +7,6 @@
 
 namespace tickstream {
 
-FileManager::FileManager(const char *inputDir, const char *outputDir) :
-	_inputDir(inputDir), _outputDir(outputDir) {}
-
 void FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 	if (fIndex >= _inputStreams.size()) return;
 
@@ -22,17 +19,9 @@ void FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 	mdata.init(buffer);
 }
 
-void FileManager::openFiles() {
-	namespace fs = std::filesystem;
-
-	for (auto &entry: fs::directory_iterator(_inputDir)) {
-		if (entry.path().extension() == ".txt") {
-			if (!_inputStreams.emplace_back(entry.path(), std::ios::binary)) {
-				std::cout << "Error in loading file: " << entry.path() << std::endl;
-			} else {
-				std::cout << "Opening file: " << entry.path() << std::endl;
-			}
-		}
+void FileManager::openFile(const char *fPath) {
+	if (!_inputStreams.emplace_back(fPath, std::ios::binary)) {
+		std::cerr << "Error in opening file: " << fPath << std::endl;
 	}
 }
 
