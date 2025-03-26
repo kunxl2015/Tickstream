@@ -12,11 +12,14 @@ public:
 	~FileManager() = default;
 
 	void prepareFile(const size_t fIndex);
-	void readRecord(const size_t &fIndex, MarketData &mdata);
-	void writeRecord(MarketData buffer[], int bufferSize);
+
+	bool readRecord(const size_t &fIndex, MarketData &mdata);
+	void writeRecord(MarketData &mdata);
+	void readRecords(const size_t &fIndex, MarketData &mdata, std::vector<MarketData> &buffer);
+	void writeRecords(MarketData buffer[], int bufferSize);
 
 	void closeFiles();
-	void openFile(const char *fPath);
+	bool openFile(const char *fPath);
 	void setOutputStream(const char *fPath);
 private:
 	std::ofstream _outputStream;

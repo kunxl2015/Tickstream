@@ -20,28 +20,46 @@ void FileManager::prepareFile(const size_t fIndex) {
 
 	return;
 }
-// Optimise how you can minimise the number of sys-calls over here.
-void FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
-	if (fIndex >= _inputStreams.size()) return;
 
-	std::string buffer;
-	std::getline(_inputStreams[fIndex], buffer);
+bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
+	if (fIndex >= _inputStreams.size())
+		return false;
 
-	mdata.init(buffer);
+	if (!_inputStreams[fIndex].is_open() || _inputStreams[fIndex].eof())
+		return false;
+
+	std::string line;
+	std::getline(_inputStreams[fIndex], line);
+	if (line.size() == 0) return false;
+
+	mdata.init(line, fIndex);
+	return true;
 }
 
-void FileManager::writeRecord(MarketData buffer[], int bufferSize) {
+// Optimise how you can minimise the number of sys-calls over here.
+void FileManager::readRecords(const size_t &fIndex, MarketData &mdata, std::vector<MarketData> &buffer) {
+	if (fIndex >= _inputStreams.size()) return;
+
+	std::string line;
+	while (std::getline(_inputStreams[fIndex], line)) {
+		mdata.init(line, fIndex);
+		buffer.emplace_back(mdata);
+	}
+}
+
+void FileManager::writeRecords(MarketData buffer[], int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		const char *data = buffer[i].serialise();
 		_outputStream.write(data, strlen(data));
 	}
 }
 
-void FileManager::openFile(const char *fPath) {
+bool FileManager::openFile(const char *fPath) {
 	if (!_inputStreams.emplace_back(fPath, std::ios::binary)) {
-		std::cerr << "Error in opening file: " << fPath << std::endl;
+		return false;
 	}
 
+	return true;
 }
 
 void FileManager::closeFiles() {
@@ -50,6 +68,8 @@ void FileManager::closeFiles() {
 	}
 
 	if (_outputStream.is_open()) _outputStream.close();
+	_inputStreams.clear();
+	_outputStream.clear();
 }
 
 void FileManager::setOutputStream(const char *fPath) {
