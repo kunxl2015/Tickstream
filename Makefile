@@ -8,8 +8,9 @@ BENCH_NAME := benchmarks
 SRC_FILES := ./src/*.cpp
 BENCH_FILES := ./benchmarks/*.cpp
 
-APP_INCLUDES := -I./includes/
-CXXFLAGS := -std=c++20
+CXXFLAGS := -std=c++20 -O3
+DEBUGFLAGS := -DDEBUG
+APP_INCLUDES := -I./includes/ -I./
 
 ifeq ($(OS), Windows)
 	CXX := g++ -O3
@@ -20,13 +21,12 @@ endif
 default: build run
 
 build:
-	$(CXX) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME) $(CXXFLAGS)
+	$(CXX) $(CXXFLAGS) $(APP_INCLUDES) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME)
 
 debug:
-	$(CXX) main.cpp -o $(BUILD_DIR)$(APP_NAME) $(CXXFLAGS)
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(APP_INCLUDES) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME)
 
 benchmark:
-	$(CXX) $(BENCH_FILES) -o $(BUILD_DIR)$(BENCH_NAME) $(CXXFLAGS) -lbenchmark -lpthread
-
+	$(CXX) $(CXXFLAGS) -lbenchmark -lpthread $(APP_INCLUDES) $(BENCH_FILES) -o $(BUILD_DIR)$(BENCH_NAME)
 run:
 	$(BUILD_DIR)$(APP_NAME) ./ ./
