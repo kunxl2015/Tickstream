@@ -1,6 +1,10 @@
 #include "pipeline.h"
 
 int main(int argc, char *argv[]) {
+	/*
+	 * Parse command-line arguments for the input directory (source data)
+	 * and the output directory (destination of the sorted file).
+	 */
 	if (argc < 3) {
 		std::cerr << "Usage: " << argv[0] << "<inputDir> <outputDir>\n";
 		return 1;
@@ -13,7 +17,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "InputDir: " << inputDir << std::endl;
 	std::cout << "OutputDir: " << outputDir << std::endl;
 
-	// Initialise and start the pipeline
+	// Initialise and Start the Pipeline.
 	tickstream::Pipeline pipeline(inputDir, outputDir);
 	pipeline.init();
 	pipeline.run();
