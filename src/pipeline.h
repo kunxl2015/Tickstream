@@ -17,7 +17,7 @@ private:
 	const char *_inputDir;
 	const char *_outputDir;
 
-	FileManager _fileManger;
+	FileManager _fileManager;
 	std::vector<std::vector<std::string>> _batches;
 };
 
