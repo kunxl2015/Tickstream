@@ -23,4 +23,4 @@ debug:
 	$(CXX) main.cpp -o $(BUILD_DIR)$(APP_NAME) $(CXXFLAGS)
 
 run:
-	$(BUILD_DIR)$(APP_NAME)
+	$(BUILD_DIR)$(APP_NAME) ./ ./
