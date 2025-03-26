@@ -3,8 +3,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "fileManager.h"
-#include "marketData.hpp"
+#include "src/fileManager.h"
+#include "src/marketData.h"
 
 namespace tickstream {
 

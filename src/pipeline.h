@@ -1,7 +1,8 @@
 #ifndef TICKSTREAM_ENGINE_HPP
 #define TICKSTREAM_ENGINE_HPP
 
-#include "fileManager.h"
+#include "src/fileManager.h"
+
 namespace tickstream {
 
 class Pipeline {

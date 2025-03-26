@@ -1,8 +1,9 @@
 #ifndef TICKSTREAM_PARSER_H
 #define TICKSTREAM_PARSER_H
 
-#include "marketData.hpp"
 #include <fstream>
+
+#include "src/marketData.h"
 
 namespace tickstream {
 

@@ -1,8 +1,9 @@
-#include "pipeline.h"
 #include <ostream>
 #include <queue>
 #include <string>
 #include <vector>
+
+#include "src/pipeline.h"
 
 namespace tickstream {
 

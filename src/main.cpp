@@ -1,4 +1,4 @@
-#include "pipeline.h"
+#include "src/pipeline.h"
 
 int main(int argc, char *argv[]) {
 	/*
