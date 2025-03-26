@@ -13,7 +13,8 @@ public:
     void shutdown();
 
 private:
-	uint32_t _batchSize;
+	size_t _batchSize;
+	size_t _totalBatches;
 	const char *_inputDir;
 	const char *_outputDir;
 

@@ -1,11 +1,14 @@
 #include "pipeline.h"
 #include <ostream>
 #include <queue>
+#include <string>
+#include <vector>
 
 namespace tickstream {
 
 Pipeline::Pipeline(const char *inputDir, const char *outputDir) {
 	_batchSize = 100;
+	_totalBatches = 100;
 	_inputDir = inputDir;
 	_outputDir = outputDir;
 }
@@ -13,20 +16,24 @@ Pipeline::Pipeline(const char *inputDir, const char *outputDir) {
 void Pipeline::init() {
 	namespace fs = std::filesystem;
 
-	_batches.resize(_batchSize);
-	for (int i = 0; i < _batchSize; i++) {
-		_batches[i].reserve(100);
+	_batches.resize(_totalBatches);
+	for (int i = 0; i < _totalBatches; i++) {
+		_batches[i].reserve(_batchSize);
 	}
 
 	int fileCount = 0;
 	for (auto &entry: fs::directory_iterator(_inputDir)) {
-		int index = fileCount / _batchSize;
+		if (entry.path().extension() == ".txt") {
+			int index = fileCount / _batchSize;
 
-		if (entry.path().extension() == ".txt"){
-			_batches[index].emplace_back(entry.path().c_str());
-			std::cout << entry.path().c_str() << std::endl;
+			if (index >= _totalBatches) {
+				_totalBatches += 1;
+				_batches.emplace_back();
+			}
+
+			_batches[index].emplace_back(entry.path());
+			fileCount++;
 		}
-		fileCount++;
 	}
 }
 
