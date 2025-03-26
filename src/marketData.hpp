@@ -21,7 +21,7 @@ public:
 	}
 
 	// Initialise marketData object using a single string
-	void init(const std::string &line) {
+	void init(const std::string &line, const size_t &fIndex) {
 		std::stringstream ss(line);
 
 		std::string buffer;
@@ -39,19 +39,25 @@ public:
 
 		std::getline(ss, buffer, ',');
 		_type = strdup(buffer.c_str());
+
+		_fIndex = fIndex;
 	}
 
 	bool operator<(const MarketData &other) const {
 		return _timestamp < other._timestamp;
 	}
 
+	uint64_t getTimeStamp() const {
+		return _timestamp;
+	}
+
 	const char *serialise() {
 		const char *timestamp = formatTimeStamp(_timestamp);
-		size_t size = std::snprintf(nullptr, 0, "%s, %.2f, %d,%s,%s",
+		size_t size = std::snprintf(nullptr, 0, "%s, %.2f, %d,%s,%s\n",
 				timestamp, _price, _size, _exchange, _type);
 
-		char *buffer = new char[size];
-		std::snprintf(buffer, size, "%s, %.2f, %d,%s,%s",
+		char *buffer = new char[size + 1];
+		std::snprintf(buffer, size + 1, "%s, %.2f, %d,%s,%s\n",
 				timestamp, _price,	_size, _exchange, _type);
 
 		return buffer;
@@ -89,14 +95,20 @@ public:
 		return epoch_seconds * 1'000'000ULL + microseconds;
 	}
 
+	size_t getFindex() {
+		return _fIndex;
+	}
+
 	void print() {
-		std::cout << _timestamp << "," << _price << "," << _size << "," << _exchange << "," << _type << std::endl;
+		const char *buffer = serialise();
+		std::cout << buffer;
 	}
 private:
 	uint64_t _timestamp;
 	const char *_exchange;
 	const char *_type;
 	float _price;
+	size_t _fIndex = 0;
 	uint32_t _size;
 };
 
