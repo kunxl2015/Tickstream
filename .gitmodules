@@ -1,0 +1,3 @@
+[submodule "includes/benchmark"]
+	path = includes/benchmark
+	url = git@github.com:google/benchmark.git
