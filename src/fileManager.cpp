@@ -1,6 +1,8 @@
 #include "src/fileManager.hpp"
 #include "src/marketData.hpp"
 
+#include <filesystem>
+
 namespace tickstream {
 
 FileManager::FileManager() {
@@ -28,7 +30,8 @@ bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 	std::getline(_inputStreams[fIndex], line);
 	if (line.size() == 0) return false;
 
-	mdata.init(line, fIndex, _filenames[fIndex].c_str());
+	printf("Opening File: %s from: %lu files\n", _filenames[fIndex].c_str(), _filenames.size());
+	mdata.init(line, fIndex, "");
 	return true;
 }
 
@@ -93,9 +96,9 @@ bool FileManager::openFile(const char *fPath) {
 		return false;
 	}
 
-
 	std::string name = std::filesystem::path(fPath).stem().string();
-	_filenames.emplace_back(fPath);
+	_filenames.emplace_back(name.c_str());
+
 	return true;
 }
 
@@ -106,6 +109,7 @@ void FileManager::closeFiles() {
 
 	if (_outputStream.is_open()) _outputStream.close();
 
+	_filenames.clear();
 	_inputStreams.clear();
 	_outputStream.clear();
 }
@@ -114,7 +118,19 @@ void FileManager::setOutputStream(const char *fPath) {
 	if (_outputStream.is_open())
 		_outputStream.close();
 
-	_outputStream.open(fPath, std::ios::out);
+	namespace fs = std::filesystem;
+
+	fs::path filePath(fPath);
+	fs::path dirPath = filePath.parent_path();
+
+	if (!dirPath.empty() && !fs::exists(dirPath)) {
+		if (!fs::create_directories(dirPath)) {
+			std::cerr << "Failed to create directory: " << dirPath << std::endl;
+			return;
+		}
+	}
+
+	_outputStream.open(fPath, std::ios::out | std::ios::binary);
 	if (!_outputStream) {
 		std::cerr << "Unable to open file: " << fPath << std::endl;
 		return;
