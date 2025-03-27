@@ -24,11 +24,11 @@ endif
 default: build run
 
 build:
-	mkdir bin
+	mkdir -p bin
 	$(CXX) $(CXXFLAGS) $(APP_INCLUDES) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME)
 
 debug:
-	mkdir bin
+	mkdir -p bin
 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(APP_INCLUDES) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME)
 
 benchmark:
