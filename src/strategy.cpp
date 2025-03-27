@@ -21,7 +21,7 @@ void Pipeline::processBatch(size_t index) {
 	logTime("[TIME] Load Batch Time (index: " + std::to_string(index) + ")", batchStart);
 
 	auto sortStart = std::chrono::high_resolution_clock::now();
-	sort(buffer.begin(), buffer.end());
+	std::sort(buffer.begin(), buffer.end());
 	logTime("[TIME] Sort Batch Time (index: " + std::to_string(index) + ")", sortStart);
 
 	auto writeStart = std::chrono::high_resolution_clock::now();
