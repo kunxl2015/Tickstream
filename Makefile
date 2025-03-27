@@ -12,6 +12,9 @@ CXXFLAGS := -std=c++20 -O3
 DEBUGFLAGS := -DDEBUG
 APP_INCLUDES := -I./includes/ -I./
 
+INPUT_DIRECTORY ?= ./data/
+OUTPUT_DIRECTORY ?= ./output/
+
 ifeq ($(OS), Windows)
 	CXX := g++ -O3
 else
@@ -29,4 +32,4 @@ debug:
 benchmark:
 	$(CXX) $(CXXFLAGS) -lbenchmark -lpthread $(APP_INCLUDES) $(BENCH_FILES) -o $(BUILD_DIR)$(BENCH_NAME)
 run:
-	$(BUILD_DIR)$(APP_NAME) ./ ./
+	$(BUILD_DIR)$(APP_NAME) $(INPUT_DIRECTORY) $(OUTPUT_DIRECTORY)

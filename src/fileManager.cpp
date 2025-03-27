@@ -3,8 +3,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "src/fileManager.h"
-#include "src/marketData.h"
+#include "src/fileManager.hpp"
+#include "src/marketData.hpp"
 
 namespace tickstream {
 
@@ -36,22 +36,60 @@ bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 	return true;
 }
 
-// Optimise how you can minimise the number of sys-calls over here.
-void FileManager::readRecords(const size_t &fIndex, MarketData &mdata, std::vector<MarketData> &buffer) {
+// TODO: Optimise sys-calls over here.
+void FileManager::readRecords(const size_t &fIndex, std::vector<MarketData> &buffer) {
 	if (fIndex >= _inputStreams.size()) return;
 
-	std::string line;
-	while (std::getline(_inputStreams[fIndex], line)) {
-		mdata.init(line, fIndex);
-		buffer.emplace_back(mdata);
+	const size_t BUFFER_SIZE = 4 * 1024 * 1024; // 4 MB
+	std::vector<char> chunk(BUFFER_SIZE);
+	std::string lineBuffer;
+
+	while (_inputStreams[fIndex]) {
+		_inputStreams[fIndex].read(chunk.data(), BUFFER_SIZE);
+		std::streamsize bytesRead = _inputStreams[fIndex].gcount();
+
+		char *start = chunk.data();
+		char *end = chunk.data() + bytesRead;
+
+		while (start < end) {
+			char *newline = static_cast<char *>(memchr(start, '\n', end - start));
+
+			if (!newline) {
+				lineBuffer.append(start, end - start);
+				break;
+			}
+
+			lineBuffer.append(start, newline - start);
+
+			MarketData mdata;
+			mdata.init(lineBuffer, fIndex);
+			buffer.emplace_back(std::move(mdata));
+
+			lineBuffer.clear();
+			start = newline + 1;
+		}
+	}
+
+	if (!lineBuffer.empty()) {
+		MarketData mdata;
+		mdata.init(lineBuffer, fIndex);
+		buffer.emplace_back(std::move(mdata));
 	}
 }
 
-void FileManager::writeRecords(MarketData buffer[], int bufferSize) {
-	for (int i = 0; i < bufferSize; i++) {
-		const char *data = buffer[i].serialise();
-		_outputStream.write(data, strlen(data));
+void FileManager::writeRecords(const std::vector<MarketData> &buffer) {
+	std::vector<char> writeBuffer;
+	writeBuffer.reserve(buffer.size() * 128);
+
+	for (const MarketData &item: buffer) {
+		const char *data = item.serialise();
+		size_t len = std::strlen(data);
+
+		writeBuffer.insert(writeBuffer.end(), data, data + len);
+		delete[] data;
 	}
+
+	_outputStream.write(writeBuffer.data(), writeBuffer.size());
 }
 
 bool FileManager::openFile(const char *fPath) {
@@ -68,6 +106,7 @@ void FileManager::closeFiles() {
 	}
 
 	if (_outputStream.is_open()) _outputStream.close();
+
 	_inputStreams.clear();
 	_outputStream.clear();
 }

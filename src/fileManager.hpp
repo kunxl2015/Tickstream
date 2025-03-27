@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include "src/marketData.h"
+#include "src/marketData.hpp"
 
 namespace tickstream {
 
@@ -15,9 +15,9 @@ public:
 	void prepareFile(const size_t fIndex);
 
 	bool readRecord(const size_t &fIndex, MarketData &mdata);
+	void readRecords(const size_t &fIndex, std::vector<MarketData> &buffer);
 	void writeRecord(MarketData &mdata);
-	void readRecords(const size_t &fIndex, MarketData &mdata, std::vector<MarketData> &buffer);
-	void writeRecords(MarketData buffer[], int bufferSize);
+	void writeRecords(const std::vector<MarketData> &buffer);
 
 	void closeFiles();
 	bool openFile(const char *fPath);

@@ -1,31 +1,39 @@
 import random
+import string
+import datetime
 
 # Number of records per file
-num_records = 1000000
+num_records = 500000
 
+file_names = [
+    f"/Users/kunaltiwari/TickStream/data/data_part{i}.txt"
+    for i in range(17)
+]
 
-file_names = []
-for i in range(10000):
-    file_name = f"data_part{i}.txt"
-    file_names.append(file_name)
+def random_exchange():
+    return random.choice(["NYSE_ARCA", "NSX", "NYSE", "NASDAQ"])
+
+def random_type():
+    return random.choice(["Ask", "Bid", "TRADE"])
+
+def random_timestamp():
+    base_time = datetime.datetime(2021, 3, 1, 0, 0, 0)
+    delta = datetime.timedelta(days=random.randint(0, 15), milliseconds=random.randint(0, 86399999))
+    return (base_time + delta).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 def generate_market_data_line():
-    # Each field is a random uint32_t value (0 to 2^32-1)
-    # You can adjust the ranges as needed.
-    timestamp = random.randint(1, 1_000_000)
-    token = random.randint(1000, 9999)
-    bidPrice = random.randint(100, 500)
-    bidQuantity = random.randint(1, 1000)
-    askPrice = random.randint(101, 600)
-    askQuantity = random.randint(1, 1000)
-    lastTradedPrice = random.randint(100, 500)
-    lastTradedQuantity = random.randint(1, 1000)
+    _timestamp = random_timestamp()
+    _price = round(random.uniform(46.0, 47.0), 2)  # Float price
+    _size = random.randint(100, 150)  # uint32_t size
+    _exchange = random_exchange()  # Exchange name
+    _type = random_type()  # Market data type
 
-    # Format the values as a single space-separated line
-    return f"{timestamp} {token} {bidPrice} {bidQuantity} {askPrice} {askQuantity} {lastTradedPrice} {lastTradedQuantity}\n"
+    # Format the values
+    return f"{_timestamp}, {_price}, {_size}, {_exchange}, {_type}\n"
 
 # Generate and write each file
 for file_name in file_names:
     with open(file_name, "w") as f:
+        print(f"Writing to file: {file_name}")
         for _ in range(num_records):
             f.write(generate_market_data_line())
