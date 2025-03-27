@@ -4,7 +4,7 @@
 namespace tickstream {
 
 void Pipeline::processBatches() {
-	for (size_t batchIndex = 0; batchIndex < _batches.size(); batchIndex++) {
+	for (size_t batchIndex = 0; batchIndex < _totalBatches; batchIndex++) {
 		if (!_batches[batchIndex].size())
 			return;
 
@@ -61,7 +61,7 @@ void Pipeline::writeBatch(size_t index, const std::vector<MarketData>& buffer) {
 void Pipeline::mergeBatches() {
 	auto mergeStart = std::chrono::high_resolution_clock::now();
 
-	MinHeap minHeap;
+	MinHeap minHeap(comp);
 	initialiseMinHeap(minHeap);
 
 	std::vector<MergeBuffer> mergeBuffer;
@@ -83,16 +83,21 @@ void Pipeline::initialiseMergeBuffer(std::vector<MergeBuffer> &mergeBuffer) {
 }
 
 void Pipeline::initialiseMinHeap(MinHeap &minHeap) {
+	auto start = std::chrono::high_resolution_clock::now();
+
 	for (size_t fIndex = 0; fIndex < _totalBatches; fIndex++) {
 		std::string intermediatePath = getIntermediateFilePath(fIndex);
+		printf("Opening Intermediate Path: %s\n", intermediatePath.c_str());
 		if (_fileManager.openFile(intermediatePath.c_str())) {
 			MarketData mdata;
 			if (_fileManager.readRecord(fIndex, mdata)) {
-				minHeap.push(std::move(mdata));
-				printf("[INFO] Initialized MinHeap\n");
+				minHeap.emplace(std::move(mdata));
 			}
 		}
 	}
+
+	printf("[INFO] Initialised MinHeap\n");
+	logTime("[INFO] Initialising MinHeap Time: ", start);
 }
 
 void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuffer) {
