@@ -1,6 +1,7 @@
 #ifndef TICKSTREAM_ENGINE_HPP
 #define TICKSTREAM_ENGINE_HPP
 
+#include "src/pch.hpp"
 #include "src/fileManager.hpp"
 
 namespace tickstream {

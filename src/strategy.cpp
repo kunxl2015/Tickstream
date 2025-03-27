@@ -1,5 +1,4 @@
 #include "src/pipeline.hpp"
-#include <cstdint>
 
 namespace tickstream {
 
