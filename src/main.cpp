@@ -1,6 +1,3 @@
-#include <chrono>
-#include <iostream>
-
 #include "src/pipeline.hpp"
 
 int main(int argc, char *argv[]) {
@@ -15,6 +12,8 @@ int main(int argc, char *argv[]) {
 
 	const char *inputDir = argv[1];
 	const char *outputDir = argv[2];
+	size_t batchSize = (argc > 3) ? atoi(argv[3]) : 100;
+	size_t totalFiles = (argc > 4) ? atoi(argv[4]) : 10000;
 
 	std::cout << "Program name: " << argv[0] << std::endl;
 	std::cout << "InputDir: " << inputDir << std::endl;
@@ -24,7 +23,7 @@ int main(int argc, char *argv[]) {
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	tickstream::Pipeline pipeline(inputDir, outputDir);
+	tickstream::Pipeline pipeline(inputDir, outputDir, batchSize, (totalFiles / batchSize) + 1);
 	pipeline.init();
 	pipeline.run();
 	pipeline.shutdown();

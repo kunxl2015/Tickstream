@@ -1,15 +1,10 @@
-#include <cstdint>
-#include <ctime>
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include "src/marketData.hpp"
 
 namespace tickstream {
 
 MarketData::MarketData() {
 	_exchange = nullptr;
+	_symbol = nullptr;
 	_type = nullptr;
 	_timestamp = 0;
 	_size = 0;
@@ -30,6 +25,12 @@ MarketData::MarketData(const MarketData &other) {
 		std::strcpy(_exchange, other._exchange);
 	}
 
+	if (other._symbol) {
+		size_t len = std::strlen(other._symbol);
+		_symbol = new char[len + 1];
+		std::strcpy(_symbol, other._symbol);
+	}
+
 	if (other._type) {
 		size_t len = std::strlen(other._type);
 		_type = new char[len + 1];
@@ -43,10 +44,12 @@ MarketData::MarketData(MarketData &&other) noexcept {
 	_price = other._price;
 	_size = other._size;
 	_exchange = other._exchange;
+	_symbol = other._symbol;
 	_type = other._type;
 	_fIndex = other._fIndex;
 
 	other._exchange = nullptr;
+	other._symbol = nullptr;
 	other._type = nullptr;
 }
 
@@ -55,14 +58,37 @@ MarketData &MarketData::operator=(const MarketData &other) {
 	if (this == &other) return *this;
 
 	delete[] _exchange;
+	delete[] _symbol;
 	delete[] _type;
 
 	_timestamp = other._timestamp;
 	_price = other._price;
 	_size = other._size;
 	_fIndex = other._fIndex;
-	_exchange = other._exchange ? strdup(other._exchange) : nullptr;
-	_type = other._type ? strdup(other._type) : nullptr;
+
+	if (other._exchange) {
+		size_t len = std::strlen(other._exchange);
+		_exchange = new char[len + 1];
+		std::strcpy(_exchange, other._exchange);
+	} else {
+		_exchange = nullptr;
+	}
+
+	if (other._symbol) {
+		size_t len = std::strlen(other._symbol);
+		_symbol = new char[len + 1];
+		std::strcpy(_symbol, other._symbol);
+	} else {
+		_symbol = nullptr;
+	}
+
+	if (other._type) {
+		size_t len = std::strlen(other._type);
+		_type = new char[len + 1];
+		std::strcpy(_type, other._type);
+	} else {
+		_type = nullptr;
+	}
 
 	return *this;
 }
@@ -72,6 +98,7 @@ MarketData &MarketData::operator=(MarketData &&other) noexcept {
 	if (this == &other) return *this;
 
 	delete[] _exchange;
+	delete[] _symbol;
 	delete[] _type;
 
 	_timestamp = other._timestamp;
@@ -79,9 +106,11 @@ MarketData &MarketData::operator=(MarketData &&other) noexcept {
 	_size = other._size;
 	_fIndex = other._fIndex;
 	_exchange = other._exchange;
+	_symbol = other._symbol;
 	_type = other._type;
 
 	other._exchange = nullptr;
+	other._symbol = nullptr;
 	other._type = nullptr;
 
 	return *this;
@@ -91,12 +120,15 @@ MarketData::~MarketData() {
 	if (_exchange)
 		delete[] _exchange;
 
+	if (_symbol)
+		delete[] _symbol;
+
 	if (_type)
 		delete[] _type;
 }
 
 // Initialise marketData object using a single string
-void MarketData::init(const std::string &line, const size_t &fIndex) {
+void MarketData::init(const std::string &line, const size_t &fIndex, const char *symbol) {
 	std::stringstream ss(line);
 
 	std::string buffer;
@@ -117,10 +149,18 @@ void MarketData::init(const std::string &line, const size_t &fIndex) {
 	_type = new char[buffer.size() + 1];
 	std::strcpy(_type, (char *)buffer.c_str());
 
+	size_t len = std::strlen(symbol);
+	_symbol = new char[len + 1];
+	std::strcpy(_symbol, symbol);
+
 	_fIndex = fIndex;
 }
 
 bool MarketData::operator<(const MarketData &other) const {
+	if (_timestamp == other._timestamp) {
+		return _symbol < other._symbol;
+	}
+
 	return _timestamp < other._timestamp;
 }
 
@@ -166,12 +206,12 @@ uint64_t MarketData::parseTimeStamp(const char *ts) const {
 
 const char *MarketData::serialise() const {
 	const char *timestamp = formatTimeStamp(_timestamp);
-	size_t size = std::snprintf(nullptr, 0, "%s, %.2f, %d,%s,%s, %zu\n",
-			timestamp, _price, _size, _exchange, _type, _fIndex);
+	size_t size = std::snprintf(nullptr, 0, "%s, %.2f, %d,%s,%s, %s\n",
+			timestamp, _price, _size, _exchange, _type, _symbol);
 
 	char *buffer = new char[size + 1];
-	std::snprintf(buffer, size + 1, "%s, %.2f, %d,%s,%s, %zu\n",
-			timestamp, _price,	_size, _exchange, _type, _fIndex);
+	std::snprintf(buffer, size + 1, "%s, %.2f, %d,%s,%s, %s\n",
+			timestamp, _price,	_size, _exchange, _type, _symbol);
 
 	return buffer;
 }

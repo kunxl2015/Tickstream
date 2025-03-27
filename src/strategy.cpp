@@ -1,3 +1,4 @@
+#include "src/mergeBuffer.hpp"
 #include "src/pipeline.hpp"
 
 namespace tickstream {
@@ -58,35 +59,50 @@ void Pipeline::writeBatch(size_t index, const std::vector<MarketData>& buffer) {
 }
 
 void Pipeline::mergeBatches() {
-	printf("[INFO] Starting Merge Operation\n");
 	auto mergeStart = std::chrono::high_resolution_clock::now();
 
 	MinHeap minHeap;
-	initializeMinHeap(minHeap);
-	mergeRecords(minHeap);
+	initialiseMinHeap(minHeap);
+
+	std::vector<MergeBuffer> mergeBuffer;
+	mergeBuffer.resize(_totalBatches);
+	initialiseMergeBuffer(mergeBuffer);
+
+	mergeRecords(minHeap, mergeBuffer);
 
 	logTime("[TIME] Total Merge Time", mergeStart);
 }
 
-void Pipeline::initializeMinHeap(MinHeap &minHeap) {
-	for (size_t fIndex = 0; fIndex < 100; fIndex++) {
+void Pipeline::initialiseMergeBuffer(std::vector<MergeBuffer> &mergeBuffer) {
+	for (size_t fIndex = 0; fIndex < _totalBatches; fIndex++) {
+		mergeBuffer[fIndex].setFileIndex(fIndex);
+		mergeBuffer[fIndex].refill(_fileManager);
+		mergeBuffer.emplace_back(mergeBuffer[fIndex]);
+	}
+	printf("[INFO] Initialized MergeBuffer of size: %zu\n", mergeBuffer[0]._records.size());
+}
+
+void Pipeline::initialiseMinHeap(MinHeap &minHeap) {
+	for (size_t fIndex = 0; fIndex < _totalBatches; fIndex++) {
 		std::string intermediatePath = getIntermediateFilePath(fIndex);
 		if (_fileManager.openFile(intermediatePath.c_str())) {
 			MarketData mdata;
 			if (_fileManager.readRecord(fIndex, mdata)) {
 				minHeap.push(std::move(mdata));
-				printf("[INFO] Initialized MinHeap with File Index %zu\n", fIndex);
+				printf("[INFO] Initialized MinHeap\n");
 			}
 		}
 	}
 }
 
-void Pipeline::mergeRecords(MinHeap &minHeap) {
+void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuffer) {
+	printf("[INFO] Starting Merge Operation\n");
+
 	std::string outputPath = getOutputFilePath();
 	_fileManager.setOutputStream(outputPath.c_str());
 
 	std::vector<MarketData> buffer;
-	buffer.reserve(1000);
+	buffer.reserve(1000000);
 
 	while (!minHeap.empty()) {
 		MarketData current = std::move(minHeap.top());
@@ -94,14 +110,20 @@ void Pipeline::mergeRecords(MinHeap &minHeap) {
 
 		buffer.emplace_back(std::move(current));
 
-		if (buffer.size() >= 1000) {
+		if (buffer.size() >= 1000000) {
+			printf("[INFO] Writing the first 1000000\n");
 			_fileManager.writeRecords(buffer);
 			buffer.clear();
 		}
 
 		MarketData nextData;
 		int currentIndex = current.getFindex();
-		if (_fileManager.readRecord(currentIndex, nextData)) {
+		// Change this to take in data from the buffer
+		if (mergeBuffer[currentIndex].empty()) {
+			mergeBuffer[currentIndex].refill(_fileManager);
+		}
+
+		if (mergeBuffer[currentIndex].next(nextData)) {
 			minHeap.push(std::move(nextData));
 		}
 	}

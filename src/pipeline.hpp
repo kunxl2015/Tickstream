@@ -1,6 +1,7 @@
 #ifndef TICKSTREAM_ENGINE_HPP
 #define TICKSTREAM_ENGINE_HPP
 
+#include "src/mergeBuffer.hpp"
 #include "src/pch.hpp"
 #include "src/fileManager.hpp"
 
@@ -13,7 +14,7 @@ using MinHeap = std::priority_queue<MarketData, std::vector<MarketData>, decltyp
 
 class Pipeline {
 public:
-    Pipeline(const char *inputDir, const char *outputDir);
+    Pipeline(const char *inputDir, const char *outputDir, size_t batchSize, size_t totalBatches);
 
     void init();
     void run();
@@ -29,24 +30,23 @@ private:
 
 	// K-way merge
 	void mergeBatches();
-	void initializeMinHeap(MinHeap &minHeap);
-	void mergeRecords(MinHeap &minHeap);
+	void initialiseMinHeap(MinHeap &minHeap);
+	void initialiseMergeBuffer(std::vector<MergeBuffer> &mergeBuffer);
+	void mergeRecords(MinHeap &minHeap,  std::vector<MergeBuffer> &mergeBuffer);
 
 	// Helper methods
 	std::string getIntermediateFilePath(size_t index);
 	std::string getOutputFilePath();
 	void logTime(const std::string& label, std::chrono::time_point<std::chrono::high_resolution_clock> start);
 
-	size_t _batchSize;
-	size_t _totalBatches;
+	size_t _batchSize; // Number of files in a batch.
+	size_t _totalBatches; // Number of total batches.
 	const char *_inputDir;
 	const char *_outputDir;
 
 	FileManager _fileManager;
 	std::vector<std::vector<std::string>> _batches;
 };
-
-extern Pipeline app;
 
 } // namespace tickstream
 

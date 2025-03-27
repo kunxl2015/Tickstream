@@ -1,16 +1,14 @@
-#include <iostream>
-#include <ostream>
-#include <queue>
-#include <string>
-#include <vector>
-
 #include "src/pipeline.hpp"
 
 namespace tickstream {
 
-Pipeline::Pipeline(const char *inputDir, const char *outputDir) {
-	_batchSize = 100;
-	_totalBatches = 100;
+Pipeline::Pipeline(
+		const char *inputDir,
+		const char *outputDir,
+		size_t batchSize,
+		size_t totalBatches) {
+	_batchSize = batchSize;
+	_totalBatches = totalBatches;
 	_inputDir = inputDir;
 	_outputDir = outputDir;
 }
@@ -25,8 +23,9 @@ void Pipeline::init() {
 
 	int fileCount = 0;
 	for (auto &entry: fs::directory_iterator(_inputDir)) {
+		int index = 0;
 		if (entry.path().extension() == ".txt") {
-			int index = fileCount / _batchSize;
+			index = fileCount / _batchSize;
 
 			if (index >= _totalBatches) {
 				_totalBatches += 1;
@@ -36,6 +35,9 @@ void Pipeline::init() {
 			_batches[index].emplace_back(entry.path());
 			fileCount++;
 		}
+
+		if (index + 1 < _totalBatches)
+			_totalBatches = index + 1;
 	}
 }
 

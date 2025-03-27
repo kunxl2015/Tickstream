@@ -25,7 +25,7 @@ public:
 
 	bool operator<(const MarketData &other) const;
 
-	void init(const std::string &line, const size_t &fIndex);
+	void init(const std::string &line, const size_t &fIndex, const char *symbol);
 
 	size_t getFindex() const;
 	uint64_t getTimeStamp() const;
@@ -39,6 +39,7 @@ private:
 
 	uint64_t _timestamp;
 	char *_exchange;
+	char *_symbol;
 	char *_type;
 	float _price;
 	size_t _fIndex = 0;

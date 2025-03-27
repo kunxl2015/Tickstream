@@ -15,13 +15,15 @@ public:
 
 	bool readRecord(const size_t &fIndex, MarketData &mdata);
 	void readRecords(const size_t &fIndex, std::vector<MarketData> &buffer);
-	void writeRecord(MarketData &mdata);
+	bool writeRecord(MarketData &mdata);
 	void writeRecords(const std::vector<MarketData> &buffer);
 
 	void closeFiles();
 	bool openFile(const char *fPath);
 	void setOutputStream(const char *fPath);
 private:
+	std::vector<std::string> _filenames;
+
 	std::ofstream _outputStream;
 	std::vector<std::ifstream> _inputStreams;
 };

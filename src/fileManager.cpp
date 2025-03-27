@@ -1,14 +1,10 @@
-#include <cstring>
-#include <filesystem>
-#include <iostream>
-#include <sstream>
-
 #include "src/fileManager.hpp"
 #include "src/marketData.hpp"
 
 namespace tickstream {
 
 FileManager::FileManager() {
+	_filenames.reserve(100);
 	_inputStreams.reserve(100);
 }
 
@@ -32,7 +28,7 @@ bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 	std::getline(_inputStreams[fIndex], line);
 	if (line.size() == 0) return false;
 
-	mdata.init(line, fIndex);
+	mdata.init(line, fIndex, _filenames[fIndex].c_str());
 	return true;
 }
 
@@ -40,7 +36,7 @@ bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 void FileManager::readRecords(const size_t &fIndex, std::vector<MarketData> &buffer) {
 	if (fIndex >= _inputStreams.size()) return;
 
-	const size_t BUFFER_SIZE = 4 * 1024 * 1024; // 4 MB
+	const size_t BUFFER_SIZE = 10 * 1024 * 1024; // 4 MB
 	std::vector<char> chunk(BUFFER_SIZE);
 	std::string lineBuffer;
 
@@ -62,7 +58,7 @@ void FileManager::readRecords(const size_t &fIndex, std::vector<MarketData> &buf
 			lineBuffer.append(start, newline - start);
 
 			MarketData mdata;
-			mdata.init(lineBuffer, fIndex);
+			mdata.init(lineBuffer, fIndex, _filenames[fIndex].c_str());
 			buffer.emplace_back(std::move(mdata));
 
 			lineBuffer.clear();
@@ -72,7 +68,7 @@ void FileManager::readRecords(const size_t &fIndex, std::vector<MarketData> &buf
 
 	if (!lineBuffer.empty()) {
 		MarketData mdata;
-		mdata.init(lineBuffer, fIndex);
+		mdata.init(lineBuffer, fIndex, _filenames[fIndex].c_str());
 		buffer.emplace_back(std::move(mdata));
 	}
 }
@@ -97,6 +93,9 @@ bool FileManager::openFile(const char *fPath) {
 		return false;
 	}
 
+
+	std::string name = std::filesystem::path(fPath).stem().string();
+	_filenames.emplace_back(fPath);
 	return true;
 }
 

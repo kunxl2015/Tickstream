@@ -7,5 +7,6 @@
 #include <sstream>
 #include <cstdint>
 #include <ctime>
+#include <chrono>
 #include <ostream>
 #include <queue>
