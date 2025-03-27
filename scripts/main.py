@@ -3,7 +3,7 @@ import string
 import datetime
 
 # Number of records per file
-num_records = 500000
+num_records = 100000
 
 file_names = [
     f"/Users/kunaltiwari/TickStream/data/data_part{i}.txt"

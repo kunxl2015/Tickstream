@@ -39,7 +39,7 @@ bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 void FileManager::readRecords(const size_t &fIndex, std::vector<MarketData> &buffer) {
 	if (fIndex >= _inputStreams.size()) return;
 
-	const size_t BUFFER_SIZE = 10 * 1024 * 1024; // 4 MB
+	const size_t BUFFER_SIZE = 4000000; // 4 MB
 	std::vector<char> chunk(BUFFER_SIZE);
 	std::string lineBuffer;
 

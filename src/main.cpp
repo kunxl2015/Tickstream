@@ -20,7 +20,6 @@ int main(int argc, char *argv[]) {
 	std::cout << "OutputDir: " << outputDir << std::endl;
 
 	// Initialise and Start the Pipeline.
-
 	auto start = std::chrono::high_resolution_clock::now();
 
 	tickstream::Pipeline pipeline(inputDir, outputDir, batchSize, (totalFiles / batchSize) + 1);

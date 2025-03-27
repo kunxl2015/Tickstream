@@ -107,7 +107,7 @@ void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuf
 	_fileManager.setOutputStream(outputPath.c_str());
 
 	std::vector<MarketData> buffer;
-	buffer.reserve(1000000);
+	buffer.reserve(10000000);
 
 	while (!minHeap.empty()) {
 		MarketData current = std::move(minHeap.top());
@@ -115,7 +115,7 @@ void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuf
 
 		buffer.emplace_back(std::move(current));
 
-		if (buffer.size() >= 1000000) {
+		if (buffer.size() >= 10000000) {
 			printf("[INFO] Writing the first 1000000\n");
 			_fileManager.writeRecords(buffer);
 			buffer.clear();
