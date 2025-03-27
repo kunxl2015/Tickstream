@@ -8,7 +8,7 @@ BENCH_NAME := benchmarks
 SRC_FILES := ./src/*.cpp
 BENCH_FILES := ./benchmarks/*.cpp
 
-CXXFLAGS := -std=c++20 -O3
+CXXFLAGS := -std=c++20 -O3 -fsanitize=address
 DEBUGFLAGS := -DDEBUG
 APP_INCLUDES := -I./includes/ -I./
 
@@ -24,12 +24,16 @@ endif
 default: build run
 
 build:
+	mkdir bin
 	$(CXX) $(CXXFLAGS) $(APP_INCLUDES) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME)
 
 debug:
+	mkdir bin
 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(APP_INCLUDES) $(SRC_FILES) -o $(BUILD_DIR)$(APP_NAME)
 
 benchmark:
+	mkdir bin
 	$(CXX) $(CXXFLAGS) -lbenchmark -lpthread $(APP_INCLUDES) $(BENCH_FILES) -o $(BUILD_DIR)$(BENCH_NAME)
+
 run:
 	$(BUILD_DIR)$(APP_NAME) $(INPUT_DIRECTORY) $(OUTPUT_DIRECTORY)
