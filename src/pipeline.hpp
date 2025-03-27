@@ -7,7 +7,7 @@
 
 namespace tickstream {
 
-inline bool comp(const MarketData &a, const MarketData &b) {
+inline bool comp(MarketData &a, MarketData &b) {
 	return a.getTimeStamp() < b.getTimeStamp();
 }
 using MinHeap = std::priority_queue<MarketData, std::vector<MarketData>, decltype(&comp)>;

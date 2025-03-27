@@ -206,12 +206,12 @@ uint64_t MarketData::parseTimeStamp(const char *ts) const {
 
 const char *MarketData::serialise() const {
 	const char *timestamp = formatTimeStamp(_timestamp);
-	size_t size = std::snprintf(nullptr, 0, "%s, %.2f, %d,%s,%s, %s\n",
+	size_t size = std::snprintf(nullptr, 0, "%s, %.2f, %d,%s,%s,%s\n",
 			timestamp, _price, _size, _exchange, _type, _symbol);
 
 	char *buffer = new char[size + 1];
-	std::snprintf(buffer, size + 1, "%s, %.2f, %d,%s,%s, %s\n",
-			timestamp, _price,	_size, _exchange, _type, _symbol);
+	std::snprintf(buffer, size + 1, "%s, %.2f, %d,%s,%s,%s\n",
+			timestamp, _price, _size, _exchange, _type, _symbol);
 
 	return buffer;
 }
@@ -219,6 +219,7 @@ const char *MarketData::serialise() const {
 void MarketData::print() {
 	const char *buffer = serialise();
 	std::cout << buffer;
+	delete[] buffer;
 }
 
 } // namespace tickstream
