@@ -29,7 +29,7 @@ void Pipeline::processBatch(size_t index) {
 	logTime("[TIME] Write Batch Time (index: " + std::to_string(index) + ")", writeStart);
 }
 
-std::vector<MarketData> Pipeline::loadBatch(const std::vector<std::string>& files) {
+std::vector<MarketData> Pipeline::loadBatch(const std::vector<std::string> &files) {
 	std::vector<MarketData> buffer;
 	buffer.reserve(files.size() * 200000);
 
@@ -74,21 +74,24 @@ void Pipeline::initialiseMergeBuffer(std::vector<MergeBuffer> &mergeBuffer) {
 		mergeBuffer[fIndex].refill(_fileManager);
 		mergeBuffer.emplace_back(mergeBuffer[fIndex]);
 	}
-	printf("[INFO] Initialized MergeBuffer of size: %zu\n", mergeBuffer[0]._records.size());
+	printf("[INFO] Initialised MergeBuffer of size: %zu\n", mergeBuffer[0]._records.size());
 }
 
 void Pipeline::initialiseMinHeap(MinHeap &minHeap) {
+	printf("[INFO] Initialising MinHeap\n");
 	auto start = std::chrono::high_resolution_clock::now();
 
+	std::vector<MarketData> buffer;
+	buffer.reserve(10000000);
 	for (size_t fIndex = 0; fIndex < _totalBatches; fIndex++) {
 		std::string intermediatePath = getIntermediateFilePath(fIndex);
-		printf("Opening Intermediate Path: %s\n", intermediatePath.c_str());
 		if (_fileManager.openFile(intermediatePath.c_str())) {
-			MarketData mdata;
-			if (_fileManager.readRecord(fIndex, mdata)) {
-				minHeap.emplace(std::move(mdata));
-			}
+			_fileManager.readRecords(fIndex, buffer);
 		}
+	}
+
+	for (MarketData &data: buffer) {
+		minHeap.push(std::move(data));
 	}
 
 	printf("[INFO] Initialised MinHeap\n");
@@ -114,6 +117,7 @@ void Pipeline::mergeRecords(MinHeap &minHeap) {
 		if (buffer.size() >= 1000000) {
 			_fileManager.writeRecords(buffer);
 			buffer.clear();
+			printf("[INFO] Written 1,000,000 records to disk.\n");
 		}
 
 		MarketData nextData;
