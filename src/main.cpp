@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-	printf("Time taken for execution is: %lld", duration.count());
+	printf("Time taken for execution is: %lld\n", duration.count());
 
 	return 0;
 }
