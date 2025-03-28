@@ -1,3 +1,5 @@
+#include <chrono>
+#include <iostream>
 #include "src/pipeline.hpp"
 
 int main(int argc, char *argv[]) {

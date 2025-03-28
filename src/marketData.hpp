@@ -1,7 +1,8 @@
 #ifndef TICKSTREAM_MARKET_DATA_H
 #define TICKSTREAM_MARKET_DATA_H
 
-#include "src/pch.hpp"
+#include <cstdint>
+#include <string>
 
 namespace tickstream {
 

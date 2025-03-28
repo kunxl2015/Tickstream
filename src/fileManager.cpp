@@ -1,7 +1,9 @@
+#include <cstring>
+#include <iostream>
+#include <filesystem>
+
 #include "src/fileManager.hpp"
 #include "src/marketData.hpp"
-
-#include <filesystem>
 
 namespace tickstream {
 

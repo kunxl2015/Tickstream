@@ -1,3 +1,7 @@
+#include <filesystem>
+#include <vector>
+#include <queue>
+
 #include "src/pipeline.hpp"
 
 namespace tickstream {
@@ -7,8 +11,8 @@ Pipeline::Pipeline(
 		const char *outputDir,
 		size_t batchSize,
 		size_t totalBatches) {
-	_batchSize = batchSize;
-	_totalBatches = totalBatches;
+	_batchSize = 5;
+	_totalBatches = 3;
 	_inputDir = inputDir;
 	_outputDir = outputDir;
 }
@@ -32,7 +36,7 @@ void Pipeline::init() {
 				_batches.emplace_back();
 			}
 
-			_batches[index].emplace_back(entry.path());
+			_batches[index].push_back(entry.path().string());
 			fileCount++;
 		}
 

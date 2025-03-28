@@ -1,3 +1,8 @@
+#include <cstring>
+#include <ctime>
+#include <iostream>
+#include <sstream>
+
 #include "src/marketData.hpp"
 
 namespace tickstream {

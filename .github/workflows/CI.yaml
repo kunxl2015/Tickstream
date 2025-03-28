@@ -31,5 +31,4 @@ jobs:
 
       - name: Build project
         run: |
-          mkdir bin
-          make
+          make build

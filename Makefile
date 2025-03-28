@@ -15,7 +15,7 @@ APP_INCLUDES := -I./includes/ -I./
 INPUT_DIRECTORY ?= ./data/
 OUTPUT_DIRECTORY ?= ./output/
 
-ifeq ($(OS), Windows)
+ifeq ($(OS), Windows_NT)
 	CXX := g++ -O3
 else
 	CXX := clang++ -O3
