@@ -63,12 +63,7 @@ void Pipeline::mergeBatches() {
 
 	MinHeap minHeap(comp);
 	initialiseMinHeap(minHeap);
-
-	std::vector<MergeBuffer> mergeBuffer;
-	mergeBuffer.resize(_totalBatches);
-	initialiseMergeBuffer(mergeBuffer);
-
-	mergeRecords(minHeap, mergeBuffer);
+	mergeRecords(minHeap);
 
 	logTime("[TIME] Total Merge Time", mergeStart);
 }
@@ -100,14 +95,15 @@ void Pipeline::initialiseMinHeap(MinHeap &minHeap) {
 	logTime("[INFO] Initialising MinHeap Time: ", start);
 }
 
-void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuffer) {
+void Pipeline::mergeRecords(MinHeap &minHeap) {
 	printf("[INFO] Starting Merge Operation\n");
+	auto start = std::chrono::high_resolution_clock::now();
 
 	std::string outputPath = getOutputFilePath();
 	_fileManager.setOutputStream(outputPath.c_str());
 
 	std::vector<MarketData> buffer;
-	buffer.reserve(10000000);
+	buffer.reserve(1000000);
 
 	while (!minHeap.empty()) {
 		MarketData current = std::move(minHeap.top());
@@ -115,20 +111,14 @@ void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuf
 
 		buffer.emplace_back(std::move(current));
 
-		if (buffer.size() >= 10000000) {
-			printf("[INFO] Writing the first 1000000\n");
+		if (buffer.size() >= 1000000) {
 			_fileManager.writeRecords(buffer);
 			buffer.clear();
 		}
 
 		MarketData nextData;
 		int currentIndex = current.getFindex();
-		// Change this to take in data from the buffer
-		if (mergeBuffer[currentIndex].empty()) {
-			mergeBuffer[currentIndex].refill(_fileManager);
-		}
-
-		if (mergeBuffer[currentIndex].next(nextData)) {
+		if (_fileManager.readRecord(currentIndex, nextData)) {
 			minHeap.push(std::move(nextData));
 		}
 	}
@@ -136,6 +126,7 @@ void Pipeline::mergeRecords(MinHeap &minHeap, std::vector<MergeBuffer> &mergeBuf
 	_fileManager.writeRecords(buffer);
 	_fileManager.closeFiles();
 	printf("[INFO] Merge Operation Completed\n");
+	logTime("[TIME] Merge Operation Time: ", start);
 }
 
 std::string Pipeline::getIntermediateFilePath(size_t index) {
@@ -149,7 +140,7 @@ std::string Pipeline::getOutputFilePath() {
 void Pipeline::logTime(const std::string& label, std::chrono::time_point<std::chrono::high_resolution_clock> start) {
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	printf("%s: %llu ms\n", label.c_str(), duration);
+	printf("%s: %lld ms\n", label.c_str(), duration);
 }
 
 } // namespace tickstream

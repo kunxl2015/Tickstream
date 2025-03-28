@@ -30,7 +30,6 @@ bool FileManager::readRecord(const size_t &fIndex, MarketData &mdata) {
 	std::getline(_inputStreams[fIndex], line);
 	if (line.size() == 0) return false;
 
-	printf("Opening File: %s from: %lu files\n", _filenames[fIndex].c_str(), _filenames.size());
 	mdata.init(line, fIndex, "");
 	return true;
 }

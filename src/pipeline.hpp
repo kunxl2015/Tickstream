@@ -32,7 +32,7 @@ private:
 	void mergeBatches();
 	void initialiseMinHeap(MinHeap &minHeap);
 	void initialiseMergeBuffer(std::vector<MergeBuffer> &mergeBuffer);
-	void mergeRecords(MinHeap &minHeap,  std::vector<MergeBuffer> &mergeBuffer);
+	void mergeRecords(MinHeap &minHeap);
 
 	// Helper methods
 	std::string getIntermediateFilePath(size_t index);
