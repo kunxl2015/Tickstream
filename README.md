@@ -18,4 +18,5 @@ make build
 
 ### Results
 Generated 2GB of sample market data across 200 files using a Python script and successfully merged and sorted the dataset in **444 seconds** using the C++ tool.
-[Image](https://drive.google.com/file/d/1nvWX-yYe0TA4hjkTxRXxT5MAumndwU-U/view?usp=sharing)
+![Merge Performance](assets/results.png)
+
