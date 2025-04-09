@@ -9,7 +9,7 @@ SRC_FILES := ./src/*.cpp
 BENCH_FILES := ./benchmarks/*.cpp
 
 CXXFLAGS := -std=c++20 -O3 -fsanitize=address
-DEBUGFLAGS := -DDEBUG
+DEBUGFLAGS := -DDEBUG -g
 APP_INCLUDES := -I./includes/ -I./
 
 INPUT_DIRECTORY ?= ./data/

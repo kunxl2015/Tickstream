@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
 
 #include "src/mergeBuffer.hpp"
 #include "src/pipeline.hpp"
