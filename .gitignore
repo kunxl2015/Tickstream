@@ -23,10 +23,6 @@
 *.swp
 
 # CMake and Makefiles
-CMakeFiles/
-CMakeCache.txt
-Makefile
-cmake_install.cmake
 
 # Compiled binary outputs
 bin/
