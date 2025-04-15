@@ -41,15 +41,15 @@ void FileManager::readRecords(const size_t &fIndex, std::vector<MarketData> &buf
 	if (fIndex >= _inputStreams.size()) return;
 
 	const size_t BUFFER_SIZE = 4000000; // 4 MB
-	std::vector<char> chunk(BUFFER_SIZE);
+	char chunk[BUFFER_SIZE];
 	std::string lineBuffer;
 
 	while (_inputStreams[fIndex]) {
-		_inputStreams[fIndex].read(chunk.data(), BUFFER_SIZE);
+		_inputStreams[fIndex].read(chunk, BUFFER_SIZE);
 		std::streamsize bytesRead = _inputStreams[fIndex].gcount();
 
-		char *start = chunk.data();
-		char *end = chunk.data() + bytesRead;
+		char *start = chunk;
+		char *end = chunk + bytesRead;
 
 		while (start < end) {
 			char *newline = static_cast<char *>(memchr(start, '\n', end - start));
@@ -93,9 +93,12 @@ void FileManager::writeRecords(const std::vector<MarketData> &buffer) {
 }
 
 bool FileManager::openFile(const char *fPath) {
-	if (!_inputStreams.emplace_back(fPath, std::ios::binary)) {
+	std::ifstream inFile(fPath, std::ifstream::binary);
+	if (!inFile.is_open()) {
 		return false;
 	}
+
+	_inputStreams.push_back(std::move(inFile));
 
 	std::string name = std::filesystem::path(fPath).stem().string();
 	_filenames.emplace_back(name.c_str());
