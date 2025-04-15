@@ -11,8 +11,8 @@ Pipeline::Pipeline(
 		const char *outputDir,
 		size_t batchSize,
 		size_t totalBatches) {
-	_batchSize = 5;
-	_totalBatches = 3;
+	_batchSize = batchSize;
+	_totalBatches = totalBatches;
 	_inputDir = inputDir;
 	_outputDir = outputDir;
 }
